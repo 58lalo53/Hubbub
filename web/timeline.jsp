@@ -28,7 +28,9 @@
             <h2>Time Line</h2>
             <c:forEach var="post" items="${posts}">
                 <div class="post">
-                    <span class="postAuthor">${post.author}</span>
+                    <a href="index?action=profile&username=${post.author}">
+                        <span class="postAuthor">${post.author}</span>
+                    </a>
                     <span class="postDate">(user since ${post.author.joinDate})</span>
                     <div id="postContent">
                         ${post.content}

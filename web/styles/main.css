@@ -101,3 +101,12 @@ form {
     padding: 8px;
     background-color: #dddddd;
 }
+
+a {
+    text-decoration: none;
+}
+
+.biography {
+    margin: 16px;
+    padding: 16px;
+}

@@ -28,6 +28,7 @@ public class Controller extends HttpServlet {
             case "post": destination = post(request); break;
             case "login": destination = login(request); break;
             case "logout": destination = logout(request); break;
+            case "profile": destination = profile(request); break;
         }
         request.getRequestDispatcher(destination + ".jsp").forward(request, response);
     }
@@ -131,6 +132,25 @@ public class Controller extends HttpServlet {
     private String logout(HttpServletRequest request) throws ServletException {
         request.getSession().removeAttribute("user");
         return timeline(request);
+    }
+    
+    private String profile(HttpServletRequest request) throws ServletException {
+        String username = request.getParameter("username");
+        if (username == null || username.length() < 4)  {
+            request.setAttribute("flash", "Whose profile are you looking for?");
+            return timeline(request);
+        }
+        HubbubDB db = (HubbubDB)request.getSession().getAttribute("db");
+        try {
+            User u = db.getUserByUsername(username);
+            Profile p = db.getProfile(u.getProfileId());
+            request.setAttribute("user", u);
+            request.setAttribute("profile", p);
+            return "profile";
+        } catch (SQLException sqle) {
+            request.setAttribute("flash", sqle.getMessage());
+            return timeline(request);
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

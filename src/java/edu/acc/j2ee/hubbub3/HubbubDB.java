@@ -17,16 +17,18 @@ public class HubbubDB implements java.lang.AutoCloseable {
     private final PreparedStatement psGET_POSTS;
     private final PreparedStatement psGET_USER;
     private final PreparedStatement psGET_USER2;
+    private final PreparedStatement psGET_PROFILE;
     private final Statement STAT;
     
     public HubbubDB() throws SQLException {
         String cs = "jdbc:derby://localhost:1527/hubbub;user=javauser;password=javauser";
         this.CONN = DriverManager.getConnection(cs);
-        this.psADD_USER = CONN.prepareStatement("INSERT INTO USERS VALUES (?,?,?)");
+        this.psADD_USER = CONN.prepareStatement("INSERT INTO USERS (username,password,joinDate) VALUES (?,?,?)");
         this.psADD_POST = CONN.prepareStatement("INSERT INTO POSTS (CONTENT,AUTHOR,POSTDATE) VALUES (?,?,?)");
         this.psGET_POSTS = CONN.prepareStatement("SELECT * FROM POSTS WHERE AUTHOR = ?");
-        this.psGET_USER = CONN.prepareStatement("SELECT username,joinDate FROM USERS WHERE USERNAME = ?");
-        this.psGET_USER2 = CONN.prepareStatement("SELECT username,joinDate FROM USERS WHERE USERNAME = ? AND PASSWORD = ?");
+        this.psGET_USER = CONN.prepareStatement("SELECT username,profile,joinDate FROM USERS WHERE USERNAME = ?");
+        this.psGET_USER2 = CONN.prepareStatement("SELECT username,profile,joinDate FROM USERS WHERE USERNAME = ? AND PASSWORD = ?");
+        this.psGET_PROFILE = CONN.prepareStatement("SELECT biography,email FROM PROFILES WHERE id = ?");
         this.STAT = CONN.createStatement();
     }
     
@@ -56,15 +58,17 @@ public class HubbubDB implements java.lang.AutoCloseable {
     public User[] getAllUsers() throws SQLException {
         int count = this.getUserCount();
         if (count == 0) return null;
-        String query = "SELECT * FROM USERS";
+        String query = "SELECT (username,profile,joinDate) FROM USERS";
         ResultSet rs = STAT.executeQuery(query);
         User[] users = new User[count];
         int usrIdx = 0;
         while (rs.next()) {
             String username = rs.getString(1);
-            Date joinDate = rs.getDate(2);
+            int profileId = rs.getInt(2);
+            Date joinDate = rs.getDate(3);
             User u = new User();
             u.setUsername(username);
+            u.setProfileId(profileId);
             u.setJoinDate(joinDate);
             users[usrIdx++] = u;
         }
@@ -104,15 +108,16 @@ public class HubbubDB implements java.lang.AutoCloseable {
 
     }
     
-    private User getUserByUsername(String username) throws SQLException {
+    public User getUserByUsername(String username) throws SQLException {
         psGET_USER.setString(1, username);
         User user;
         try (ResultSet rs = psGET_USER.executeQuery()) {
             if (!rs.next()) return null;
             user = new User();
             user.setUsername(username);
-            Date d = rs.getDate(2);
+            Date d = rs.getDate(3);
             user.setJoinDate(d);
+            user.setProfileId(rs.getInt(2));
         }
         return user;
     }
@@ -125,9 +130,22 @@ public class HubbubDB implements java.lang.AutoCloseable {
             if (!rs.next()) return null;
             user = new User();
             user.setUsername(rs.getString(1));
-            user.setJoinDate(rs.getDate(2));
+            user.setJoinDate(rs.getDate(3));
+            user.setProfileId(rs.getInt(2));
         }
         return user;
+    }
+    
+    public Profile getProfile(int id) throws SQLException {
+        psGET_PROFILE.setInt(1, id);
+        Profile p;
+        try (ResultSet rs = psGET_PROFILE.executeQuery()) {
+            if (!rs.next()) return null;
+            p = new Profile();
+            p.setBiography(rs.getString(1));
+            p.setEmail(rs.getString(2));
+        }
+        return p;
     }
     
     @Override
@@ -137,6 +155,7 @@ public class HubbubDB implements java.lang.AutoCloseable {
         this.psADD_USER.close();
         this.psGET_USER.close();
         this.psGET_USER2.close();
+        this.psGET_PROFILE.close();
         this.CONN.close();
     }
 }
