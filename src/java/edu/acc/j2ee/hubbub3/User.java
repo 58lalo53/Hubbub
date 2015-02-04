@@ -1,7 +1,5 @@
 package edu.acc.j2ee.hubbub3;
 
-import java.util.*;
-
 public class User implements java.io.Serializable {
     private String username;
     private java.util.Date joinDate;

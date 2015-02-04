@@ -1,0 +1,12 @@
+/user/add
+/user/login
+/user/list
+/user/logout
+
+/post/add
+/post/list
+/post/edit
+
+/profile/add
+/profile/edit
+

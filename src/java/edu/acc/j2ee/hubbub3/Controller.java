@@ -19,7 +19,7 @@ public class Controller extends HttpServlet {
             request.setAttribute("flash", "Cannot connect to database.");
             action = "timeline";
         }
-
+        
         String destination;
         switch (action) {
             default:
@@ -47,15 +47,17 @@ public class Controller extends HttpServlet {
     private String join(HttpServletRequest request) throws ServletException {
         HttpSession session = request.getSession();
         String username = request.getParameter("username");
+        String password = request.getParameter("password");
         if (username == null) return "join";
-        if (username.length() < 4 || username.length() > 10) {
+        if (username.length() < 4 || username.length() > 10 ||
+            password.length() < 4 || password.length() > 10 ) {
             request.setAttribute("flash", "Username must be between 4 and 10 characters.");
             return "join";
         }
         try {
             User user = new User(username);
             HubbubDB db = (HubbubDB)session.getAttribute("db");
-            db.addUser(user);
+            db.addUser(username,password);
             session.setAttribute("user", user);
             return timeline(request);
         } catch (SQLException sqle) {

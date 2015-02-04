@@ -14,6 +14,7 @@
             <h2 class="flash">${flash}</h2>
             <form method="POST" action="index">
                 <label>User Name:</label> <input type="text" name="username" required/>
+                <label>Password:</label> <input type="password" name="password" required/>
                 <input type="hidden" name="action" value="join"/>
                 <input type="submit" value="Sign Up"/>
             </form>

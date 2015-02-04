@@ -20,7 +20,7 @@ public class HubbubDB implements java.lang.AutoCloseable {
     private final Statement STAT;
     
     public HubbubDB() throws SQLException {
-        String cs = "jdbc:derby://localhost:1527/hubbub1;user=javauser;password=javauser";
+        String cs = "jdbc:derby://localhost:1527/hubbub;user=javauser;password=javauser";
         this.CONN = DriverManager.getConnection(cs);
         this.psADD_USER = CONN.prepareStatement("INSERT INTO USERS VALUES (?,?,?)");
         this.psADD_POST = CONN.prepareStatement("INSERT INTO POSTS (CONTENT,AUTHOR,POSTDATE) VALUES (?,?,?)");
@@ -30,9 +30,10 @@ public class HubbubDB implements java.lang.AutoCloseable {
         this.STAT = CONN.createStatement();
     }
     
-    public void addUser(User u) throws SQLException {
-        psADD_USER.setString(1, u.getUsername());
-        psADD_USER.setDate(2, new Date(u.getJoinDate().getTime()));
+    public void addUser(String username, String password) throws SQLException {
+        psADD_USER.setString(1, username);
+        psADD_USER.setString(2, password);
+        psADD_USER.setDate(3, new Date( new java.util.Date().getTime() ) );
         psADD_USER.executeUpdate();
     }
     
@@ -105,25 +106,27 @@ public class HubbubDB implements java.lang.AutoCloseable {
     
     private User getUserByUsername(String username) throws SQLException {
         psGET_USER.setString(1, username);
-        ResultSet rs = psGET_USER.executeQuery();
-        if (!rs.next()) return null;
-        User user = new User();
-        user.setUsername(username);
-        Date d = rs.getDate(2);
-        user.setJoinDate(d);
-        rs.close();
+        User user;
+        try (ResultSet rs = psGET_USER.executeQuery()) {
+            if (!rs.next()) return null;
+            user = new User();
+            user.setUsername(username);
+            Date d = rs.getDate(2);
+            user.setJoinDate(d);
+        }
         return user;
     }
     
     public User authenticateUser(String username, String password) throws SQLException {
         psGET_USER2.setString(1,username);
         psGET_USER2.setString(2,password);
-        ResultSet rs = psGET_USER2.executeQuery();
-        if (!rs.next()) return null;
-        User user = new User();
-        user.setUsername(rs.getString(1));
-        user.setJoinDate(rs.getDate(2));
-        rs.close();
+        User user;
+        try (ResultSet rs = psGET_USER2.executeQuery()) {
+            if (!rs.next()) return null;
+            user = new User();
+            user.setUsername(rs.getString(1));
+            user.setJoinDate(rs.getDate(2));
+        }
         return user;
     }
     
@@ -133,6 +136,7 @@ public class HubbubDB implements java.lang.AutoCloseable {
         this.psGET_POSTS.close();
         this.psADD_USER.close();
         this.psGET_USER.close();
+        this.psGET_USER2.close();
         this.CONN.close();
     }
 }
