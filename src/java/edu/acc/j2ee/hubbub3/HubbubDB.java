@@ -21,13 +21,13 @@ public class HubbubDB implements java.lang.AutoCloseable {
     private final Statement STAT;
     
     public HubbubDB() throws SQLException {
-        String cs = "jdbc:derby://localhost:1527/hubbub;user=javauser;password=javauser";
+        String cs = "jdbc:derby://localhost:1527/hubbub1;user=javauser;password=javauser";
         this.CONN = DriverManager.getConnection(cs);
         this.psADD_USER = CONN.prepareStatement("INSERT INTO USERS (username,password,joinDate) VALUES (?,?,?)");
         this.psADD_POST = CONN.prepareStatement("INSERT INTO POSTS (CONTENT,AUTHOR,POSTDATE) VALUES (?,?,?)");
         this.psGET_POSTS = CONN.prepareStatement("SELECT * FROM POSTS WHERE AUTHOR = ?");
-        this.psGET_USER = CONN.prepareStatement("SELECT username,profile,joinDate FROM USERS WHERE USERNAME = ?");
-        this.psGET_USER2 = CONN.prepareStatement("SELECT username,profile,joinDate FROM USERS WHERE USERNAME = ? AND PASSWORD = ?");
+        this.psGET_USER = CONN.prepareStatement("SELECT username,profileId,joinDate FROM USERS WHERE USERNAME = ?");
+        this.psGET_USER2 = CONN.prepareStatement("SELECT username,profileId,joinDate FROM USERS WHERE USERNAME = ? AND PASSWORD = ?");
         this.psGET_PROFILE = CONN.prepareStatement("SELECT biography,email FROM PROFILES WHERE id = ?");
         this.STAT = CONN.createStatement();
     }
@@ -58,7 +58,7 @@ public class HubbubDB implements java.lang.AutoCloseable {
     public User[] getAllUsers() throws SQLException {
         int count = this.getUserCount();
         if (count == 0) return null;
-        String query = "SELECT (username,profile,joinDate) FROM USERS";
+        String query = "SELECT (username,profileId,joinDate) FROM USERS";
         ResultSet rs = STAT.executeQuery(query);
         User[] users = new User[count];
         int usrIdx = 0;
