@@ -29,6 +29,7 @@ public class Controller extends HttpServlet {
             case "login": destination = login(request); break;
             case "logout": destination = logout(request); break;
             case "profile": destination = profile(request); break;
+            case "pedit": destination = editProfile(request); break;
         }
         request.getRequestDispatcher(destination + ".jsp").forward(request, response);
     }
@@ -151,6 +152,16 @@ public class Controller extends HttpServlet {
             request.setAttribute("flash", sqle.getMessage());
             return timeline(request);
         }
+    }
+    
+    private String editProfile(HttpServletRequest request) throws ServletException {
+        String username = request.getParameter("username");
+        if (username == null )
+            return "profile_edit";
+        String biography = request.getParameter("biography");
+        // get the picture file name and extension
+        // read in the file and save the bytes into the db
+        return "";
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

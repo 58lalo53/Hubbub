@@ -4,13 +4,15 @@ public class Profile implements java.io.Serializable {
     private String biography;
     private String email;
     private byte[] picture;
+    private int id;
     
     public Profile() {}
     
-    public Profile(String biography, String email, byte[] picture) {
+    public Profile(String biography, String email, byte[] picture, int id) {
         this.biography = biography;
         this.email = email;
         this.picture = picture;
+        this.id = id;
     }
 
     public String getBiography() {
@@ -23,6 +25,10 @@ public class Profile implements java.io.Serializable {
 
     public byte[] getPicture() {
         return picture;
+    }
+    
+    public int getId() {
+        return id;
     }
 
     public void setBiography(String biography) {
@@ -37,4 +43,7 @@ public class Profile implements java.io.Serializable {
         this.picture = picture;
     }
     
+    public void setId(int id) {
+        this.id = id;
+    }
 }

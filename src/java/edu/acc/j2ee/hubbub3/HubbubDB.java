@@ -28,7 +28,7 @@ public class HubbubDB implements java.lang.AutoCloseable {
         this.psGET_POSTS = CONN.prepareStatement("SELECT * FROM POSTS WHERE AUTHOR = ?");
         this.psGET_USER = CONN.prepareStatement("SELECT username,profileId,joinDate FROM USERS WHERE USERNAME = ?");
         this.psGET_USER2 = CONN.prepareStatement("SELECT username,profileId,joinDate FROM USERS WHERE USERNAME = ? AND PASSWORD = ?");
-        this.psGET_PROFILE = CONN.prepareStatement("SELECT biography,email FROM PROFILES WHERE id = ?");
+        this.psGET_PROFILE = CONN.prepareStatement("SELECT biography,email,pic,id FROM PROFILES WHERE id = ?");
         this.STAT = CONN.createStatement();
     }
     
@@ -144,6 +144,8 @@ public class HubbubDB implements java.lang.AutoCloseable {
             p = new Profile();
             p.setBiography(rs.getString(1));
             p.setEmail(rs.getString(2));
+            p.setPicture(rs.getBytes(3));
+            p.setId(rs.getInt(4));
         }
         return p;
     }
